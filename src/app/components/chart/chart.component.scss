@@ -1,0 +1,56 @@
+// .donut-chart {
+//   width: 120px;
+//   height: 120px;
+//   border-radius: 50%;
+//   mask: radial-gradient(circle 90px at center, transparent 50%, black 51%);
+//   -webkit-mask: radial-gradient(
+//     circle 90px at center,
+//     transparent 50%,
+//     black 51%
+//   );
+//   transform: rotate(0deg); /* Start from top */
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   font-weight: bold;
+//   font-size: 18px;
+//   color: black;
+//   position: relative;
+//   z-index: 1;
+
+//   .percentage {
+//     position: absolute;
+//     font-size: 18px;
+//     color: black;
+//     z-index: 9;
+//   }
+// }
+.donut-chart {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(#ddd 75%, #28a745 0%); /* Counterclockwise fill */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-weight: bold;
+}
+
+.donut-chart::before {
+  content: "";
+  width: 90px; /* Controls the size of the inner hole */
+  height: 90px;
+  background: white; /* Make it blend with the background */
+  border-radius: 50%;
+  position: absolute;
+  mix-blend-mode: destination-out; /* Makes the hole truly transparent */
+}
+
+.percentage {
+  position: absolute;
+  font-size: 30px;
+  font-weight: bold;
+  color: #3f8e50;
+  z-index: 2; /* Ensure it's above the mask */
+}
