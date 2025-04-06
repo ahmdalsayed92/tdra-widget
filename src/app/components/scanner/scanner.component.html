@@ -5,7 +5,8 @@
   </h1>
 </div>
 <div class="scanner flex flex-col items-center mt-[90px]">
-  <div class="results flex flex-col items-center" *ngIf="scorePercentage">
+  <!-- *ngIf="scorePercentage" -->
+  <div class="results flex flex-col items-center">
     <app-chart [percentage]="roundPercentage(scorePercentage)"></app-chart>
     <h2 class="text-3xl font-bold mt-6">Accessibility Score</h2>
     <p class="text-lg">

@@ -11,6 +11,10 @@ import { CommonModule } from '@angular/common';
 export class ChartComponent implements OnChanges {
   @Input() percentage: number = 0;
   backgroundStyle: string = '';
+  poor = '#d83731';
+  average = '#d67909';
+  good = '#5CB85C';
+  excellent = '#5BC0DE';
 
   ngOnChanges(changes: SimpleChanges): void {
     this.updateChart();

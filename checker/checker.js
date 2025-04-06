@@ -70,6 +70,12 @@
         console.error("Error in accessibility scan:", error);
       }
     }
+    if (event.data.message === "close the widget!") {
+      const overlay = document.querySelector(".overlay");
+      const iframe = document.getElementById("iframeApp");
+      overlay?.remove();
+      iframe?.remove();
+    }
   });
 
   function drawCheckerBtn() {
