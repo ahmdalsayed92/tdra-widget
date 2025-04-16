@@ -1,11 +1,63 @@
 (async function () {
+  const appUrl = "http://localhost:58386/"; // Angular app URL
   const scriptTag = document.currentScript;
   const urlParams = new URLSearchParams(scriptTag.src.split("?")[1]);
-  const apiKey = "1";
+  const apiKey = urlParams.get("key");
+  const adminEmail = "ahmdalsayed92@gmail.com";
 
   if (!apiKey) {
     console.error("API key is missing.");
     return;
+  }
+  verifyAdmin();
+  function getAdminDataByDomain() {
+    const url = `/entities/${appUrl}/pages`;
+
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Sample expected response:
+        // { "adminEmail": "admin@example.com", "isActive": true }
+        console.log("Response:", data);
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      });
+  }
+
+  function verifyAdmin() {
+    const url = "http://localhost:3000/api/entities/validate";
+
+    const data = {
+      domain: "http://localhost:58532/",
+      apiKey: apiKey,
+      adminEmail: adminEmail,
+    };
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("Success:", result);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
   addingCheckerBtnStyleTag();
   drawCheckerBtn();
@@ -14,7 +66,7 @@
     const overlay = document.createElement("div");
     overlay.classList.add("overlay");
     const iframe = document.createElement("iframe");
-    iframe.src = "http://localhost:4200/"; // Angular app URL
+    iframe.src = appUrl; // Angular app URL
     iframe.id = "iframeApp";
 
     document.body.appendChild(iframe);
@@ -64,7 +116,7 @@
         const iframeApp = document.getElementById("iframeApp");
         iframeApp.contentWindow.postMessage(
           { message: "results", results },
-          "http://localhost:4200"
+          appUrl
         );
       } catch (error) {
         console.error("Error in accessibility scan:", error);
