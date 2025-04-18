@@ -1,24 +1,66 @@
 (async function () {
+  console.log("Checker script loaded");
+  const appUrl = "http://localhost:58386/"; // Angular app URL
   const scriptTag = document.currentScript;
   const urlParams = new URLSearchParams(scriptTag.src.split("?")[1]);
-  const apiKey = "1";
+  const apiKey = urlParams.get("key");
+  const adminEmail = "ahmdalsayed92@gmail.com";
 
   if (!apiKey) {
     console.error("API key is missing.");
     return;
   }
-  addingCheckerBtnStyleTag();
-  drawCheckerBtn();
+  verifyAdmin();
+  function getAdminDataByDomain() {}
+
+  function verifyAdmin() {
+    const url = "http://localhost:3000/api/entities/validate";
+
+    const data = {
+      domain: window.location.host,
+      apiKey: apiKey,
+      adminEmail: adminEmail,
+    };
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        addingCheckerBtnStyleTag();
+        drawCheckerBtn();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 
   function openWidget() {
     const overlay = document.createElement("div");
     overlay.classList.add("overlay");
     const iframe = document.createElement("iframe");
-    iframe.src = "http://localhost:4200/"; // Angular app URL
+    iframe.src = appUrl; // Angular app URL
     iframe.id = "iframeApp";
 
     document.body.appendChild(iframe);
     document.body.appendChild(overlay);
+    iframe.onload = function () {
+      const iframeWindow = iframe.contentWindow;
+      iframeWindow.postMessage(
+        { message: "domain", domain: window.location.href },
+        appUrl
+      );
+    };
   }
 
   async function axeScanner() {
@@ -60,11 +102,12 @@
       console.log("Starting accessibility scan...");
       try {
         const results = await axeScanner();
+        const currentPageUrl = window.location.href;
 
         const iframeApp = document.getElementById("iframeApp");
         iframeApp.contentWindow.postMessage(
-          { message: "results", results },
-          "http://localhost:4200"
+          { message: "results", results, currentPageUrl },
+          appUrl
         );
       } catch (error) {
         console.error("Error in accessibility scan:", error);

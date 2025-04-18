@@ -2,17 +2,33 @@
   <h5 class="text-[20px]">Assigned Pages</h5>
   <p class="mt-2 text-aeblack-500">4/5 scanned</p>
   <ul class="flex flex-col gap-5">
-    <li><a class="text-aeblack-950" href="">Home</a></li>
-    <li><a class="text-aeblack-950" href="">Services</a></li>
-    <li><a class="text-aeblack-950" href="">About</a></li>
-    <li><a class="text-aeblack-950" href="">Press contact and media kit</a></li>
-    <li>
-      <a class="text-aeblack-950" href=""
-        >Registered Medical Product Directory</a
-      >
+    <li *ngFor="let item of pagesList">
+      <span *ngIf="item.currentPage">
+        <svg
+          width="17"
+          height="14"
+          viewBox="0 0 17 14"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M16.1035 7.71356L10.3324 13.4847C10.212 13.605 10.0488 13.6726 9.87868 13.6726C9.70852 13.6726 9.54532 13.605 9.425 13.4847C9.30468 13.3644 9.23708 13.2012 9.23708 13.031C9.23708 12.8609 9.30468 12.6977 9.425 12.5773L14.102 7.90112H1.5426C1.37254 7.90112 1.20944 7.83357 1.08918 7.71331C0.968926 7.59306 0.901367 7.42996 0.901367 7.25989C0.901367 7.08982 0.968926 6.92672 1.08918 6.80647C1.20944 6.68621 1.37254 6.61865 1.5426 6.61865H14.102L9.425 1.94244C9.30468 1.82211 9.23708 1.65892 9.23708 1.48876C9.23708 1.3186 9.30468 1.15541 9.425 1.03509C9.54532 0.914764 9.70852 0.847168 9.87868 0.847168C10.0488 0.847168 10.212 0.914764 10.3324 1.03509L16.1035 6.80621C16.1631 6.86577 16.2104 6.93649 16.2427 7.01433C16.2749 7.09218 16.2915 7.17562 16.2915 7.25989C16.2915 7.34416 16.2749 7.4276 16.2427 7.50544C16.2104 7.58329 16.1631 7.65401 16.1035 7.71356Z"
+            fill="#343330"
+          />
+        </svg>
+      </span>
+      <a class="text-aeblack-950" [href]="item.url">{{ item.title }}</a>
+      {{ item.pageScore | number }}%
     </li>
   </ul>
   <div class="text-center">
-    <button class="aegov-btn mt-[149px]" type="button">Submit Scores</button>
+    <button
+      class="aegov-btn mt-[149px]"
+      type="button"
+      [disabled]="disableSubmitButton"
+      (click)="submitScores()"
+    >
+      Submit Scores
+    </button>
   </div>
 </div>

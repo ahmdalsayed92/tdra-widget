@@ -1,6 +1,7 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, EventEmitter, NgZone, OnInit, Output } from '@angular/core';
 import { ChartComponent } from '../chart/chart.component';
 import { CommonModule } from '@angular/common';
+import { ScoresService } from '../../services/scores.service';
 
 @Component({
   selector: 'app-scanner',
@@ -15,39 +16,55 @@ export class ScannerComponent implements OnInit {
   scorePercentage: any;
   totalRulesChecked: any;
   rulesWithIssues: any;
-  constructor(private ngZone: NgZone) {}
+  pages: Array<any> = [];
+
+  @Output() pagesScores = new EventEmitter<Object>();
+
+  constructor(private ngZone: NgZone, private scores: ScoresService) {}
 
   ngOnInit(): void {
-    // Listen for messages from the parent window
-    window.addEventListener('message', (event) => {
-      // console.log('Message received in iframe:', event.data);
+    // Get page list from ScoresService
+    this.pages = this.scores.getPages();
 
-      // Optional: Validate origin for security
+    // Listen to messages from parent
+    window.addEventListener('message', (event) => {
       if (event.data.message === 'results') {
-        // Update the message inside Angular zone
         this.ngZone.run(() => {
           this.receivedMessage = event.data.message;
           this.results = event.data.results;
-          console.log('this.results', this.results);
+          const currentPage = event.data.currentPageUrl;
 
-          // Calculate accessibility score
+          // Compute accessibility score
           this.totalRulesChecked =
             this.results.passes.length +
             this.results.violations.length +
             this.results.inapplicable.length;
+
           this.rulesWithIssues = this.results.violations.length;
+
           this.scorePercentage =
             this.totalRulesChecked === 0
               ? 100
               : ((this.totalRulesChecked - this.rulesWithIssues) /
                   this.totalRulesChecked) *
                 100;
+
+          if (currentPage) {
+            // Save the score for the current page
+            const scoreData = {
+              title: currentPage.title,
+              url: currentPage.url,
+              pageScore: this.scorePercentage,
+              currentPage,
+            };
+            localStorage.setItem(currentPage, JSON.stringify(scoreData));
+          }
         });
       }
     });
   }
+
   startScan() {
-    console.log('click inside the widget');
     window.parent.postMessage({ message: 'start the scan!' }, '*');
   }
 

@@ -6,13 +6,17 @@
 </div>
 <div class="scanner flex flex-col items-center mt-[90px]">
   <!-- *ngIf="scorePercentage" -->
-  <div class="results flex flex-col items-center">
+  <div class="results flex flex-col items-center" *ngIf="scorePercentage">
     <app-chart [percentage]="roundPercentage(scorePercentage)"></app-chart>
     <h2 class="text-3xl font-bold mt-6">Accessibility Score</h2>
     <p class="text-lg">
       {{ rulesWithIssues }}/{{ totalRulesChecked }} Passed checks
     </p>
-    <button class="aegov-btn btn-outline btn-secondary" type="button">
+    <button
+      class="aegov-btn btn-outline btn-secondary"
+      type="button"
+      (click)="startScan()"
+    >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
         <rect width="256" height="256" fill="none" aria-hidden="true" />
         <circle
