@@ -1,6 +1,8 @@
 <div class="bg-primary-50 p-[24px] rounded-lg">
   <h5 class="text-[20px]">Assigned Pages</h5>
-  <p class="mt-2 text-aeblack-500">4/5 scanned</p>
+  <p class="mt-2 text-aeblack-500">
+    {{ scannedPages }}/{{ pagesList.length }} scanned
+  </p>
   <ul class="flex flex-col gap-5">
     <li *ngFor="let item of pagesList">
       <span *ngIf="item.currentPage">
@@ -17,7 +19,9 @@
           />
         </svg>
       </span>
-      <a class="text-aeblack-950" [href]="item.url">{{ item.title }}</a>
+      <a class="text-aeblack-950" [href]="item.url" target="_blank">{{
+        item.title
+      }}</a>
       {{ item.pageScore | number }}%
     </li>
   </ul>

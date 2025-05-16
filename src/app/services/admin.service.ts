@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import {
@@ -62,8 +62,18 @@ export class AdminService {
     return this.http.get<AdminData>(`${this.baseUrl}/admin/${domain}`);
   }
 
-  getPages(domain: string): Observable<PagesResponse> {
-    return this.http.get<PagesResponse>(`${this.baseUrl}/${domain}/pages`);
+  getPages(
+    domain: string,
+    apiKey: string,
+    adminEmail: string
+  ): Observable<PagesResponse> {
+    const headers = new HttpHeaders({
+      'x-api-key': apiKey,
+      'x-admin-email': adminEmail,
+    });
+    return this.http.get<PagesResponse>(`${this.baseUrl}/${domain}/pages`, {
+      headers,
+    });
   }
 
   validateCredentials(

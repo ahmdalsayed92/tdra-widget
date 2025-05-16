@@ -3,26 +3,28 @@
     <div class="lg:flex lg:items-center">
       <div class="header-logo logos flex-1">
         <div class="header-top-right flex">
-          <a href="#">
-            <img
-              src="https://designsystem.gov.ae/img/emblem.png"
-              alt=""
-              class="emblem-logo"
-            />
-          </a>
+          <img
+            src="https://designsystem.gov.ae/img/emblem.png"
+            alt="UAE logo"
+            class="emblem-logo"
+          />
         </div>
         <div class="logo-item">
-          <a href="/" class="logo block">
+          <div class="logo block">
             <img
               src="https://designsystem.gov.ae/img/logo-tdra.svg"
-              alt="logo"
+              alt="TDRA logo"
               class="!h-auto lg:!w-72 xl:!w-80"
             />
             <span class="sr-only">Logo</span>
-          </a>
+          </div>
         </div>
       </div>
-      <button class="close-btn self-baseline" (click)="closeWidget()">
+      <button
+        class="close-btn self-baseline"
+        (click)="closeWidget()"
+        aria-label="Close Widget"
+      >
         <svg
           width="16"
           height="18"

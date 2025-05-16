@@ -15,6 +15,7 @@ export class PagesComponent implements OnInit {
   pagesList: Array<any> = [
     { title: '', url: '', currentPage: true, pageScore: null },
   ];
+  scannedPages: number = 0;
   domain = env.testedDomain;
   fullUrl = '';
   @Input() pagesScores: any;
@@ -27,46 +28,51 @@ export class PagesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.adminservice.getPages(this.domain).subscribe({
-      next: (data) => {
-        window.addEventListener('message', (event) => {
-          if (event.data.message) {
-            this.ngZone.run(() => {
-              this.fullUrl = event.data.domain;
+    window.addEventListener('message', (event) => {
+      if (event.data.message) {
+        this.ngZone.run(() => {
+          console.log('Received message from iframe:', event.data);
 
-              // Map backend pages with scores and current page info
-              this.pagesList = data.pages.map((page) => {
-                return {
-                  title: page.title,
-                  url: page.url,
-                  currentPage: this.fullUrl?.includes(page.url),
-                  pageScore: localStorage.getItem(page.url)
-                    ? JSON.parse(localStorage.getItem(page.url) || '{}')
-                        .pageScore
-                    : null,
-                };
-              });
-              console.log(
-                this.pagesList.filter((page) => page.pageScore === null)
-              );
-
-              if (
-                this.pagesList.filter((page) => page.pageScore === null)
-                  .length > 0
-              ) {
-                this.disableSubmitButton = true;
-                console.log(this.disableSubmitButton);
-              } else {
-                this.disableSubmitButton = false;
-                console.log(this.disableSubmitButton);
-              }
+          this.fullUrl = event.data.domain;
+          const apiKey = event.data.apiKey;
+          const adminEmail = event.data.adminEmail;
+          this.adminservice
+            .getPages(this.domain, apiKey, adminEmail)
+            .subscribe({
+              next: (data) => {
+                // Map backend pages with scores and current page info
+                this.pagesList = data.pages.map((page) => {
+                  return {
+                    title: page.title,
+                    url: page.url,
+                    currentPage: this.fullUrl?.includes(page.url),
+                    pageScore: localStorage.getItem(page.url)
+                      ? JSON.parse(localStorage.getItem(page.url) || '{}')
+                          .pageScore
+                      : null,
+                  };
+                });
+                this.scannedPages = this.pagesList.filter(
+                  (page) => page.pageScore !== null
+                ).length;
+                console.log(this.scannedPages);
+                if (
+                  this.pagesList.filter((page) => page.pageScore === null)
+                    .length > 0
+                ) {
+                  this.disableSubmitButton = true;
+                  console.log(this.disableSubmitButton);
+                } else {
+                  this.disableSubmitButton = false;
+                  console.log(this.disableSubmitButton);
+                }
+              },
+              error: (error) => {
+                console.error('Error loading pages:', error);
+              },
             });
-          }
         });
-      },
-      error: (error) => {
-        console.error('Error loading pages:', error);
-      },
+      }
     });
   }
 
