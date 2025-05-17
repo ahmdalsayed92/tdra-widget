@@ -32,12 +32,12 @@
   }
 
   function verifyAdmin() {
-    const url = "http://localhost:3000/api/entities/validate";
+    const url = "http://localhost:3000/api/public/validate";
 
     const data = {
       domain: window.location.host,
-      apiKey: apiKey,
-      adminEmail: adminEmail,
+      // apiKey: apiKey,
+      // adminEmail: adminEmail,
     };
 
     fetch(url, {
@@ -81,7 +81,13 @@
     iframe.onload = function () {
       const iframeWindow = iframe.contentWindow;
       iframeWindow.postMessage(
-        { message: "domain", domain: window.location.href, apiKey, adminEmail },
+        {
+          message: "domain",
+          domain: window.location.host,
+          currentPage: window.location.href,
+          apiKey,
+          adminEmail,
+        },
         appUrl
       );
     };

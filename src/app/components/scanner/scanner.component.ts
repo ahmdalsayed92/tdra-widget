@@ -52,11 +52,11 @@ export class ScannerComponent implements OnInit {
           if (currentPage) {
             // Save the score for the current page
             const scoreData = {
-              title: currentPage.title,
-              url: currentPage.url,
               pageScore: this.scorePercentage,
               currentPage,
             };
+            console.log('scoreData', scoreData);
+
             localStorage.setItem(currentPage, JSON.stringify(scoreData));
           }
         });

@@ -15,7 +15,7 @@ import { env } from '../environments/dev.env';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private readonly baseUrl = env.apiBaseUrl + '/entities';
+  private readonly baseUrl = env.apiBaseUrl + '/public';
 
   constructor(private http: HttpClient) {}
 
@@ -71,6 +71,8 @@ export class AdminService {
       'x-api-key': apiKey,
       'x-admin-email': adminEmail,
     });
+    console.log(domain);
+
     return this.http.get<PagesResponse>(`${this.baseUrl}/${domain}/pages`, {
       headers,
     });
