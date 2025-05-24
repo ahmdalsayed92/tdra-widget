@@ -4,7 +4,7 @@
     {{ scannedPages }}/{{ pagesList.length }} scanned
   </p>
   <ul class="flex flex-col gap-5">
-    <li *ngFor="let item of pagesList">
+    <li *ngFor="let item of pagesList" class="flex justify-between gap-2">
       <span *ngIf="item.currentPage">
         <svg
           width="17"
@@ -19,10 +19,10 @@
           />
         </svg>
       </span>
-      <a class="text-aeblack-950" [href]="item.url" target="_blank">{{
+      <a class="text-aeblack-950 flex-1" [href]="item.url" target="_blank">{{
         item.title
       }}</a>
-      {{ item.pageScore | number }}%
+      <span *ngIf="item.pageScore">{{ roundPercentage(item.pageScore) }}%</span>
     </li>
   </ul>
   <div class="text-center">

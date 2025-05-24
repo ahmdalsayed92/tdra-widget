@@ -3,6 +3,7 @@ import { AdminService } from '../../services/admin.service';
 import { CommonModule } from '@angular/common';
 import { env } from '../../environments/dev.env';
 import { AlertService } from '../../services/alert.service';
+import { ScoresService } from '../../services/scores.service';
 
 @Component({
   selector: 'app-pages',
@@ -25,7 +26,8 @@ export class PagesComponent implements OnInit {
   constructor(
     private adminservice: AdminService,
     private ngZone: NgZone,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private scores: ScoresService
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +48,12 @@ export class PagesComponent implements OnInit {
               next: (data) => {
                 // Map backend pages with scores and current page info
                 this.pagesList = data.pages.map((page) => {
+                  if (this.currentUrlPage?.includes(page.url)) {
+                    localStorage.setItem('currentPageTitle', '');
+                    localStorage.setItem('currentPageTitle', page.title);
+                    this.scores.setCurrentPage(page.title);
+                    this.scores.titleSubject.next(page.title);
+                  }
                   return {
                     title: page.title,
                     url: page.url,
@@ -56,6 +64,9 @@ export class PagesComponent implements OnInit {
                       : null,
                   };
                 });
+                this.scannedPages = this.pagesList.filter(
+                  (page) => page.pageScore !== null
+                ).length;
               },
               error: (error) => {
                 console.error('Error loading pages:', error);
@@ -67,6 +78,11 @@ export class PagesComponent implements OnInit {
         console.log('message type from iframe:', event.data.message);
         this.ngZone.run(() => {
           this.pagesList = this.pagesList.map((page) => {
+            if (this.currentUrlPage?.includes(page.url)) {
+              localStorage.setItem('currentPageTitle', page.title);
+              this.scores.setCurrentPage(page.title);
+              this.scores.titleSubject.next(page.title);
+            }
             return {
               title: page.title,
               url: page.url,
@@ -115,5 +131,9 @@ export class PagesComponent implements OnInit {
         //  this.alertService.showAlert('danger', error);
       },
     });
+  }
+
+  roundPercentage(value: number): number {
+    return Math.round(value);
   }
 }

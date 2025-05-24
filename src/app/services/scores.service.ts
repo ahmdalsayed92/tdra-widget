@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ export class ScoresService {
   private fullScores: Array<any> = [];
   private currentPage: string = '';
   private pages: Array<any> = [];
-
+  titleSubject = new Subject<string>();
   // Add or update score
   setScores(newScore: any) {
     // Remove any existing score for the same page title
