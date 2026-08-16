@@ -1,53 +1,34 @@
 (async function () {
-  console.log("Checker script loaded");
-  const appUrl = "http://localhost:58386/"; // Angular app URL
+  const appUrl = 'http://localhost:54324/'; // widget app URL
   const scriptTag = document.currentScript;
   const urlParams = new URLSearchParams(scriptTag.src.split("?")[1]);
   const apiKey = urlParams.get("key");
-  const adminEmail = localStorage.getItem("adminEmail");
+  let adminEmail = "";
+  let loggedInAdminEmail = localStorage.getItem('adminEmail') || "";
 
   if (!apiKey) {
     console.error("API key is missing.");
     return;
   }
-  verifyAdmin();
-  function getAdminDataByDomain() {
-    const url = `/entities/${appUrl}/pages`;
 
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Sample expected response:
-        // { "adminEmail": "admin@example.com", "isActive": true }
-        console.log("Response:", data);
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
-  }
+  adminEmail = loggedInAdminEmail;
+  verifyAdmin();
 
   function verifyAdmin() {
     const url = "http://localhost:3000/api/public/validate";
 
-    const data = {
-      domain: window.location.host,
-      // apiKey: apiKey,
-      // adminEmail: adminEmail,
+    const body = {
+      domain: window.location.host
     };
 
     fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "x-admin-email": adminEmail,
+        "x-api-key": apiKey,          // apiKey from createEntity
+        "x-admin-email": adminEmail,  // admin email from localStorage
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     })
       .then((response) => {
         if (!response.ok) {
@@ -56,12 +37,11 @@
         return response.json();
       })
       .then((result) => {
-        console.log("Success:", result);
-        if (result.valid === true) {
+        if (result.valid && result.isActive) {
           addingCheckerBtnStyleTag();
           drawCheckerBtn();
         } else {
-          alert("Invalid API key or admin email.");
+          console.error("Validation failed");
         }
       })
       .catch((error) => {
@@ -102,8 +82,12 @@
       script.onload = async () => {
         try {
           // Run axe-core
-          const results = await axe.run();
-          console.log("Results from axe: ", results);
+          const results = await axe.run({
+            exclude: [
+              ['#iframeApp'],
+              ['.checker-btn']
+            ]
+          });
 
           // Calculate accessibility score
           const totalRulesChecked =
@@ -115,7 +99,7 @@
             totalRulesChecked === 0
               ? 100
               : ((totalRulesChecked - rulesWithIssues) / totalRulesChecked) *
-                100;
+              100;
 
           resolve(results);
         } catch (error) {
@@ -129,14 +113,20 @@
   // Listen for messages from Angular app
   window.addEventListener("message", async (event) => {
     if (event.data.message === "start the scan!") {
-      console.log("Starting accessibility scan...");
       try {
         const results = await axeScanner();
         const currentPageUrl = window.location.href;
-
         const iframeApp = document.getElementById("iframeApp");
         iframeApp.contentWindow.postMessage(
-          { message: "results", results, currentPageUrl },
+          {
+            message: "results",
+            results,
+            currentPageUrl,
+            apiKey,
+            adminEmail,
+            domain: window.location.host,
+            currentPage: window.location.href,
+          },
           appUrl
         );
       } catch (error) {
@@ -203,7 +193,7 @@
     iframe {
       position: fixed;
       width: 90%;
-      height: 90vh;
+      height: 92vh;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
